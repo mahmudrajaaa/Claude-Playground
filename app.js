@@ -1,5 +1,25 @@
 // Gold and Silver Rate Tracker for Chennai
 // Data storage and management
+//
+// ============================================================================
+// API SETUP INSTRUCTIONS - Get FREE API Keys for Live Data!
+// ============================================================================
+//
+// This app uses FREE APIs to fetch real-time gold and silver rates.
+// Choose one or both options below (100 FREE requests/month each):
+//
+// OPTION 1: MetalpriceAPI.com (Recommended)
+//   1. Sign up at: https://metalpriceapi.com/
+//   2. Get your API key from dashboard
+//   3. Replace 'YOUR_METALPRICE_API_KEY' on line 87
+//
+// OPTION 2: Metals.dev
+//   1. Sign up at: https://metals.dev/
+//   2. Get your API key from dashboard
+//   3. Replace 'YOUR_METALSDEV_API_KEY' on line 142
+//
+// No API keys? No problem! The app will work with sample/cached data.
+// ============================================================================
 
 const STORAGE_KEY = 'chennai_metal_rates_history';
 const LAST_UPDATE_KEY = 'last_update_timestamp';
@@ -47,17 +67,17 @@ async function fetchCurrentRates() {
     showAlert('Fetching latest rates...', 'info');
 
     try {
-        // Try multiple data sources
-        let rates = await fetchFromMetalsAPI();
+        // Try multiple free data sources
+        let rates = await fetchFromMetalpriceAPI();
 
         if (!rates) {
-            rates = await fetchFromGoldAPI();
+            rates = await fetchFromMetalsDev();
         }
 
         if (!rates) {
             // Use fallback/mock data if all APIs fail
             rates = getFallbackRates();
-            showAlert('Using cached rates. API limit may have been reached. Rates update hourly.', 'warning');
+            showAlert('API key not configured or API limit reached. Using cached rates. See console for setup instructions.', 'warning');
         } else {
             hideAlert();
         }
@@ -74,91 +94,104 @@ async function fetchCurrentRates() {
 
     } catch (error) {
         console.error('Error fetching rates:', error);
-        showAlert('Error fetching rates. Please try again later.');
+        showAlert('Error fetching rates. Please check your API configuration.');
         displayStoredRates();
     }
 }
 
-// Fetch from Metals-API (Free tier - 50 requests/month)
-async function fetchFromMetalsAPI() {
+// Fetch from MetalpriceAPI.com (Free tier - 100 requests/month)
+async function fetchFromMetalpriceAPI() {
     try {
-        // Note: For production, you'd need to sign up and get an API key
-        // Free tier: https://metals-api.com/
-        const API_KEY = 'YOUR_METALS_API_KEY'; // Users need to replace this
+        // Sign up at https://metalpriceapi.com/ for a FREE API key
+        // Free tier: 100 requests/month, no credit card required
+        const API_KEY = 'YOUR_METALPRICE_API_KEY'; // Replace with your API key
 
-        if (API_KEY === 'YOUR_METALS_API_KEY') {
-            console.log('Metals-API key not configured');
+        if (API_KEY === 'YOUR_METALPRICE_API_KEY') {
+            console.log('MetalpriceAPI key not configured. Sign up at https://metalpriceapi.com/');
             return null;
         }
 
-        const response = await fetch(`https://metals-api.com/api/latest?access_key=${API_KEY}&base=INR&symbols=XAU,XAG`);
+        // Fetch latest rates - base is USD, we get XAU (gold), XAG (silver), and INR
+        const response = await fetch(`https://api.metalpriceapi.com/v1/latest?api_key=${API_KEY}&base=USD&currencies=XAU,XAG,INR`);
 
         if (!response.ok) {
-            throw new Error('Metals-API request failed');
+            throw new Error(`MetalpriceAPI request failed: ${response.status}`);
         }
 
         const data = await response.json();
 
-        if (data.success) {
+        if (data.success && data.rates) {
+            // MetalpriceAPI returns rates where:
+            // XAU = troy ounces of gold per USD
+            // XAG = troy ounces of silver per USD
+            // INR = Indian Rupees per USD
+
+            // Calculate price per troy ounce in USD
+            const goldPricePerOzUSD = 1 / data.rates.XAU;
+            const silverPricePerOzUSD = 1 / data.rates.XAG;
+
+            // Convert to INR
+            const goldPricePerOzINR = goldPricePerOzUSD * data.rates.INR;
+            const silverPricePerOzINR = silverPricePerOzUSD * data.rates.INR;
+
             // Convert troy ounce to grams (1 troy oz = 31.1035 grams)
-            const goldPricePerGram = (1 / data.rates.XAU) / 31.1035;
-            const silverPricePerGram = (1 / data.rates.XAG) / 31.1035;
+            const goldPricePerGram = goldPricePerOzINR / 31.1035;
+            const silverPricePerGram = silverPricePerOzINR / 31.1035;
 
             return {
                 gold24k: Math.round(goldPricePerGram),
                 gold22k: Math.round(goldPricePerGram * 0.916), // 22K is 91.6% pure
                 silver: Math.round(silverPricePerGram),
                 timestamp: Date.now(),
-                source: 'Metals-API'
+                source: 'MetalpriceAPI.com'
             };
         }
 
         return null;
     } catch (error) {
-        console.error('Metals-API error:', error);
+        console.error('MetalpriceAPI error:', error);
         return null;
     }
 }
 
-// Fetch from alternative Gold API
-async function fetchFromGoldAPI() {
+// Fetch from Metals.dev (Free tier - 100 requests/month)
+async function fetchFromMetalsDev() {
     try {
-        // Alternative free API - GoldAPI.io (limited free tier)
-        // Note: This requires API key signup
-        const API_KEY = 'YOUR_GOLD_API_KEY'; // Users need to replace this
+        // Sign up at https://metals.dev/ for a FREE API key
+        // Free tier: 100 requests/month, no credit card required
+        const API_KEY = 'YOUR_METALSDEV_API_KEY'; // Replace with your API key
 
-        if (API_KEY === 'YOUR_GOLD_API_KEY') {
-            console.log('GoldAPI key not configured');
+        if (API_KEY === 'YOUR_METALSDEV_API_KEY') {
+            console.log('Metals.dev key not configured. Sign up at https://metals.dev/');
             return null;
         }
 
-        const headers = {
-            'x-access-token': API_KEY,
-            'Content-Type': 'application/json'
-        };
-
-        const response = await fetch('https://www.goldapi.io/api/XAU/INR', { headers });
+        // Fetch latest rates in INR per gram
+        const response = await fetch(`https://api.metals.dev/v1/latest?api_key=${API_KEY}&currency=INR&unit=g`);
 
         if (!response.ok) {
-            throw new Error('GoldAPI request failed');
+            throw new Error(`Metals.dev request failed: ${response.status}`);
         }
 
-        const goldData = await response.json();
+        const data = await response.json();
 
-        // Fetch silver data
-        const silverResponse = await fetch('https://www.goldapi.io/api/XAG/INR', { headers });
-        const silverData = await silverResponse.json();
+        if (data.success && data.metals) {
+            // Metals.dev returns prices per gram in the specified currency (INR)
+            const goldPricePerGram = data.metals.gold || 0;
+            const silverPricePerGram = data.metals.silver || 0;
 
-        return {
-            gold24k: Math.round(goldData.price_gram_24k),
-            gold22k: Math.round(goldData.price_gram_22k),
-            silver: Math.round(silverData.price_gram_24k),
-            timestamp: Date.now(),
-            source: 'GoldAPI'
-        };
+            return {
+                gold24k: Math.round(goldPricePerGram),
+                gold22k: Math.round(goldPricePerGram * 0.916), // 22K is 91.6% pure
+                silver: Math.round(silverPricePerGram),
+                timestamp: Date.now(),
+                source: 'Metals.dev'
+            };
+        }
 
+        return null;
     } catch (error) {
-        console.error('GoldAPI error:', error);
+        console.error('Metals.dev error:', error);
         return null;
     }
 }

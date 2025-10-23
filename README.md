@@ -49,25 +49,41 @@ The app features:
 
 ## API Configuration (Optional)
 
-The app works out-of-the-box with sample data, but for live data, you can configure API keys:
+The app works out-of-the-box with sample data, but for **live real-time data**, you can configure FREE API keys:
 
-### Option 1: Metals-API (Recommended)
+### Option 1: MetalpriceAPI.com (Recommended) ⭐
 
-1. Sign up for a free account at [https://metals-api.com/](https://metals-api.com/)
-2. Get your API key (50 requests/month on free tier)
-3. Open `app.js` and replace `YOUR_METALS_API_KEY` with your actual key:
+**100 FREE requests/month • No credit card required**
+
+1. Sign up for a free account at [https://metalpriceapi.com/](https://metalpriceapi.com/)
+2. Get your API key from the dashboard
+3. Open `app.js` and replace `YOUR_METALPRICE_API_KEY` with your actual key (line 87):
    ```javascript
    const API_KEY = 'your_actual_api_key_here';
    ```
 
-### Option 2: GoldAPI.io
+**Why MetalpriceAPI?**
+- ✅ 100 free requests per month
+- ✅ No credit card needed
+- ✅ Real-time gold, silver, and currency data
+- ✅ Reliable and well-documented API
 
-1. Sign up at [https://www.goldapi.io/](https://www.goldapi.io/)
-2. Get your API key
-3. Open `app.js` and replace `YOUR_GOLD_API_KEY` with your actual key:
+### Option 2: Metals.dev
+
+**100 FREE requests/month • No credit card required**
+
+1. Sign up at [https://metals.dev/](https://metals.dev/)
+2. Get your API key from the dashboard
+3. Open `app.js` and replace `YOUR_METALSDEV_API_KEY` with your actual key (line 142):
    ```javascript
    const API_KEY = 'your_actual_api_key_here';
    ```
+
+**Why Metals.dev?**
+- ✅ 100 free requests per month
+- ✅ No credit card needed
+- ✅ 60-second data refresh even on free plan
+- ✅ Direct INR pricing support
 
 ### Without API Keys
 
@@ -75,6 +91,9 @@ The app will work with fallback rates and sample historical data. It's perfect f
 - Testing and demonstration
 - Understanding price trends
 - Learning web development
+- Offline usage
+
+**Note**: Configure at least one API for live data. The app automatically tries both APIs and falls back to cached data if needed.
 
 ## How It Works
 
@@ -135,11 +154,11 @@ Works on all modern browsers:
 
 ## Data Sources
 
-The app supports multiple gold/silver rate APIs:
+The app supports multiple **FREE** gold/silver rate APIs:
 
-1. **Metals-API**: Global precious metals rates API
-2. **GoldAPI.io**: Specialized gold and silver price API
-3. **Fallback Data**: Approximate Chennai market rates
+1. **MetalpriceAPI.com**: Global precious metals rates API (100 free requests/month)
+2. **Metals.dev**: Real-time precious metals and currency API (100 free requests/month)
+3. **Fallback Data**: Approximate Chennai market rates (used when APIs are not configured)
 
 ## Customization
 
