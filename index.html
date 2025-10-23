@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chennai Gold & Silver Rates - Live & Historical</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Chennai Gold & Silver Rates</h1>
+            <p class="subtitle">Current Rates & Historical Trends</p>
+            <div class="last-updated">Last Updated: <span id="lastUpdated">Loading...</span></div>
+        </header>
+
+        <div class="alert" id="alert"></div>
+
+        <section class="current-rates">
+            <h2>Current Rates</h2>
+            <div class="rate-cards">
+                <div class="rate-card gold">
+                    <div class="metal-icon">🏅</div>
+                    <h3>Gold (24K)</h3>
+                    <div class="price" id="gold24kPrice">Loading...</div>
+                    <div class="per-unit">Per gram</div>
+                    <div class="change" id="gold24kChange"></div>
+                </div>
+
+                <div class="rate-card gold">
+                    <div class="metal-icon">🥇</div>
+                    <h3>Gold (22K)</h3>
+                    <div class="price" id="gold22kPrice">Loading...</div>
+                    <div class="per-unit">Per gram</div>
+                    <div class="change" id="gold22kChange"></div>
+                </div>
+
+                <div class="rate-card silver">
+                    <div class="metal-icon">🥈</div>
+                    <h3>Silver</h3>
+                    <div class="price" id="silverPrice">Loading...</div>
+                    <div class="per-unit">Per gram</div>
+                    <div class="change" id="silverChange"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="historical-data">
+            <h2>Historical Trends (Last 7 Days)</h2>
+            <div class="chart-controls">
+                <button class="btn" onclick="changeChartView('gold')">Gold</button>
+                <button class="btn" onclick="changeChartView('silver')">Silver</button>
+                <button class="btn" onclick="changeChartView('both')">Both</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </section>
+
+        <section class="history-table">
+            <h2>Price History</h2>
+            <div class="table-responsive">
+                <table id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Gold 24K (₹/g)</th>
+                            <th>Gold 22K (₹/g)</th>
+                            <th>Silver (₹/g)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr>
+                            <td colspan="4" class="loading">Loading historical data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="about">
+            <h3>About This App</h3>
+            <p>This application provides current and historical gold and silver rates for Chennai, Tamil Nadu.
+            Rates are sourced from reliable metal price APIs and updated regularly.</p>
+            <ul>
+                <li><strong>Gold 24K:</strong> 99.9% purity gold</li>
+                <li><strong>Gold 22K:</strong> 91.6% purity gold (commonly used in jewelry)</li>
+                <li><strong>Silver:</strong> 99.9% purity silver</li>
+            </ul>
+            <p class="note"><strong>Note:</strong> Actual rates may vary slightly depending on the jeweler and location.
+            These rates are indicative and should be verified before making any transactions.</p>
+        </section>
+
+        <footer>
+            <p>Data updates every hour | Built for Chennai residents</p>
+            <button class="btn btn-refresh" onclick="refreshData()">🔄 Refresh Data</button>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
